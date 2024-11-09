@@ -3,7 +3,7 @@
 ## Preparar o Ambiente Virtual Python
 
 1. **Selecione um diretório** para hospedar sua aplicação.
-2. **Instale o `virtualenv`** (se ainda não estiver instalado):
+2. **Instale o `virtualenv`**:
    ```bash
    pip install virtualenv
    ```
