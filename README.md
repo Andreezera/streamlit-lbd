@@ -35,11 +35,24 @@
 
 ## Executar o Projeto
 
-1. **Navegue para a pasta do repositório**:
+1. **Vá para pasta raiz do ambiente virtual**:
    ```bash
-   cd lab-not/streamlit-lbd/streamlit-lbd
+   lab-not
    ```
-2. **Execute o Streamlit**:
+2. **Ative o ambiente virtual** (caso ainda não esteja ativado):
+   - **No Windows**:
+     ```bash
+     .\lab-not\Scripts\activate
+     ```
+   - **No Linux/Mac**:
+     ```bash
+     source lab-not/bin/activate
+     ```
+3. **Navegue para a pasta do repositório**:
+   ```bash
+   cd streamlit-lbd/streamlit-lbd
+   ```
+4. **Execute o Streamlit**:
    ```bash
    streamlit run app.py
    ```
