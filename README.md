@@ -42,11 +42,11 @@
 2. **Ative o ambiente virtual** (caso ainda não esteja ativado):
    - **No Windows**:
      ```bash
-     .\lab-not\Scripts\activate
+     .\Scripts\activate
      ```
    - **No Linux/Mac**:
      ```bash
-     source lab-not/bin/activate
+     source bin/activate
      ```
 3. **Navegue para a pasta do repositório**:
    ```bash
