@@ -37,7 +37,7 @@
 
 1. **Navegue para a pasta do repositório**:
    ```bash
-   cd streamlit-lbd
+   cd lab-not/streamlit-lbd/streamlit-lbd
    ```
 2. **Execute o Streamlit**:
    ```bash
