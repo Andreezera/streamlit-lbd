@@ -50,7 +50,7 @@
      ```
 3. **Navegue para a pasta do repositório**:
    ```bash
-   cd streamlit-lbd/streamlit-lbd
+   cd streamlit-lbd
    ```
 4. **Execute o Streamlit**:
    ```bash
