@@ -1,3 +1,7 @@
+
+# Link para acessar projeto
+https://projeto-lbd.streamlit.app/
+
 # Configuração e Execução do Ambiente Virtual Python
 
 ## Preparar o Ambiente Virtual Python

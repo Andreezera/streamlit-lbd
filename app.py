@@ -8,7 +8,12 @@ st.markdown("""
             Primeira **linha** *aqui*
             """)
 
-conn = mysql.connector.connect(host='localhost', user='root', password='aluno', port=3306, db='banco_escola', auth_plugin='mysql_native_password')
+conn = mysql.connector.connect(host='sql.freedb.tech', 
+                               user='freedb_freedb-user', 
+                               password='*dtvFHJ7hDq%7&G', 
+                               port=3306, 
+                               db='freedb_escola-db', 
+                               auth_plugin='mysql_native_password')
 
 cursor = conn.cursor()
 
