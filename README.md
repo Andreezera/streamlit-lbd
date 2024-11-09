@@ -30,14 +30,14 @@
    ```
 7. **Clone o repositório** na raiz do ambiente virtual:
    ```bash
-   git clone <URL_DO_REPOSITORIO>
+   git clone https://github.com/Andreezera/streamlit-lbd.git
    ```
 
 ## Executar o Projeto
 
 1. **Navegue para a pasta do repositório**:
    ```bash
-   cd <nome_do_repositorio>
+   cd streamlit-lbd
    ```
 2. **Execute o Streamlit**:
    ```bash
