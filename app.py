@@ -9,11 +9,11 @@ st.title("Análise de Escolas")
 # Conexão com o banco de dados
 def create_connection():
     return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='root',
+        host='pro.freedb.tech',
+        user='admin',
+        password='7#X?PyVGmEh4Xbu',
         port=3306,
-        db='freedb_escola-db',
+        db='escoladb',
         auth_plugin='mysql_native_password'
     )
 
