@@ -313,7 +313,7 @@ def app():
             FROM 
                 escolas e
             LEFT JOIN 
-                alunos a ON e.CO_ENTIDADE = a.CO_ENTIDADE
+                Alunos a ON e.CO_ENTIDADE = a.CO_ENTIDADE
             ORDER BY Total_Alunos DESC
         """)
     
