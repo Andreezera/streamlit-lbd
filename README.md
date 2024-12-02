@@ -58,7 +58,7 @@ https://projeto-lbd.streamlit.app/
    ```
 4. **Execute o Streamlit**:
    ```bash
-   streamlit run Principal.py
+   streamlit run app.py
    ```
 
 ## Credenciais de admin
