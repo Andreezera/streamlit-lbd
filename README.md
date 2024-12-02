@@ -1,3 +1,6 @@
+Integrantes projeto:
+- André Augusto Costa Dionísio
+- Thabata Santana Santos
 
 # Acessar Aplicação Online
 https://projeto-escolas.streamlit.app/
