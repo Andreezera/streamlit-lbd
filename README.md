@@ -63,7 +63,7 @@ https://projeto-lbd.streamlit.app/
 
 ## Credenciais de admin
 
-   **Para ter acesso total às funcionalidades do projeto, utilize usuario administrador:**:
+   **Para ter acesso total às funcionalidades do sistema, utilize usuario administrador**:
 
    ```bash
    usuario: admin@admin.com
