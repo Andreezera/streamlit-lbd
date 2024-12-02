@@ -58,5 +58,14 @@ https://projeto-lbd.streamlit.app/
    ```
 4. **Execute o Streamlit**:
    ```bash
-   streamlit run app.py
+   streamlit run Principal.py
+   ```
+
+## Credenciais de admin
+
+   **Para ter acesso total às funcionalidades do projeto, utilize usuario administrador:**:
+
+   ```bash
+   usuario: admin@admin.com
+   senha: admin
    ```

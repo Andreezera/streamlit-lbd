@@ -1,19 +1,21 @@
 import streamlit as st
 import mysql.connector
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Configuração de cabeçalho da página
 st.set_page_config(page_title="Dados Escolas", layout="wide")
-st.title("Análise de Escolas")
+st.logo("https://igce.rc.unesp.br/images/unesp.svg")
+st.title("🏫 Análise de Escolas")
 
 # Conexão com o banco de dados
 def create_connection():
     return mysql.connector.connect(
-        host='pro.freedb.tech',
-        user='admin',
-        password='7#X?PyVGmEh4Xbu',
-        port=3306,
-        db='escoladb',
+        host='mysql-3468e67c-streamlit-lbd.e.aivencloud.com',
+        user='avnadmin',
+        password='AVNS_qWwT1IkX4yxrSOOfe4t',
+        port=15308,
+        db='defaultdb',
         auth_plugin='mysql_native_password'
     )
 
@@ -192,64 +194,13 @@ def display_students_and_teachers(df_escolas):
                 WHEN m.TP_DEPENDENCIA = 3 THEN 'Municipal'
                 WHEN m.TP_DEPENDENCIA = 4 THEN 'Privada'
                 ELSE 'Desconhecido'
-            END AS Dependencia_Administrativa,
-            TRIM(TRAILING ', ' FROM 
-                CONCAT(
-                    CASE WHEN m.IN_REGULAR = 1 THEN 'Ensino Regular, ' ELSE '' END,
-                    CASE WHEN m.IN_EJA = 1 THEN 'Educação de Jovens e Adultos (EJA), ' ELSE '' END,
-                    CASE WHEN m.IN_PROFISSIONALIZANTE = 1 THEN 'Ensino Profissionalizante, ' ELSE '' END,
-                    CASE WHEN m.IN_ESPECIAL_EXCLUSIVA = 1 THEN 'Educação Especial, ' ELSE '' END
-                )
-            ) AS Niveis_Atendidos
-        FROM
-            matriculas m
-        WHERE 
-            m.CO_ENTIDADE = {selected_school_id}
+            END AS Dependencia_Administrativa
+        FROM matriculas m
+        WHERE m.CO_ENTIDADE = {selected_school_id}
+        ORDER BY m.NU_IDADE_REFERENCIA;
     """
     df_alunos = execute_query(alunos_query)
-    if df_alunos.empty:
-        st.warning("Nenhum aluno encontrado para essa escola.")
-    else:
-        st.dataframe(df_alunos, use_container_width=True)
-
-    # Exibir os professores dessa escola
-    st.subheader(f"Professores da Escola: {selected_school_name}")
-    professores_query = f"""
-        SELECT DISTINCT 
-            CO_PESSOA_FISICA AS Cod_Pessoa,
-            NU_ANO_CENSO AS Ano_Censo,
-            CASE 
-                WHEN TP_SEXO = 1 THEN 'Masculino'
-                WHEN TP_SEXO = 2 THEN 'Feminino'
-                ELSE 'Não Informado'
-            END AS Sexo,
-            CASE 
-                WHEN TP_COR_RACA = 1 THEN 'Branca'
-                WHEN TP_COR_RACA = 2 THEN 'Preta'
-                WHEN TP_COR_RACA = 3 THEN 'Parda'
-                WHEN TP_COR_RACA = 4 THEN 'Amarela'
-                WHEN TP_COR_RACA = 5 THEN 'Indígena'
-                ELSE 'Não Declarado'
-            END AS Cor_Raca,
-            CASE 
-                WHEN TP_NACIONALIDADE = 1 THEN 'Brasileiro'
-                WHEN TP_NACIONALIDADE = 2 THEN 'Estrangeiro'
-                WHEN TP_NACIONALIDADE = 3 THEN 'Naturalizado'
-                ELSE 'Não Declarado'
-            END AS Nacionalidade,
-            CO_MUNICIPIO_END AS Municipio_Residencia,
-            TP_ESCOLARIDADE AS Escolaridade,
-            TP_TIPO_DOCENTE AS Tipo_Docente
-        FROM 
-            docentes
-        WHERE 
-            CO_ENTIDADE = {selected_school_id}
-    """
-    df_professores = execute_query(professores_query)
-    if df_professores.empty:
-        st.warning("Nenhum professor encontrado para essa escola.")
-    else:
-        st.dataframe(df_professores, use_container_width=True)
+    st.dataframe(df_alunos, use_container_width=True)
 
 # Função para exibir o número de alunos agrupados por nível de ensino
 def display_students_by_level(df_escolas):
@@ -289,11 +240,132 @@ def display_students_by_level(df_escolas):
     else:
         st.dataframe(df_alunos_by_level, use_container_width=True)
 
+# Função para exibir as matrículas de alunos com deficiência intelectual ou autismo
+def display_autistic_or_intellectual_disability_students(df_escolas):
+    st.subheader("Escolas com Alunos Autistas ou com Deficiência Intelectual")
+
+    # Consulta SQL para identificar as escolas com alunos autistas ou com deficiência intelectual
+    query = """
+        SELECT 
+            e.NO_ENTIDADE AS Nome_Escola,
+            e.CO_ENTIDADE AS Codigo_Escola,
+            COUNT(m.ID_MATRICULA) AS Total_Alunos
+        FROM 
+            matriculas m
+        INNER JOIN 
+            escolas e ON m.CO_ENTIDADE = e.CO_ENTIDADE
+        WHERE 
+            m.IN_AUTISMO = 1 OR m.IN_DEF_INTELECTUAL = 1
+        GROUP BY 
+            e.CO_ENTIDADE
+        ORDER BY 
+            Total_Alunos DESC
+    """
+    df_matriculas =execute_query(query)
+
+    # Exibir a tabela no Streamlit
+    if df_matriculas.empty:
+        st.warning("Nenhuma matrícula encontrada para alunos autistas ou com deficiência intelectual.")
+    else:
+        st.dataframe(df_matriculas, use_container_width=True)
+
+    # Gráfico de barras das 10 escolas com mais alunos com autismo ou deficiência intelectual
+    st.subheader("Gráfico: Top 10 Escolas com Alunos Autistas ou com Deficiência Intelectual")
+    if not df_matriculas.empty:
+        # Selecionar as 10 escolas com mais alunos
+        top_10_escolas = df_matriculas.nlargest(10, 'Total_Alunos')
+        
+        # Criar o gráfico
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(top_10_escolas['Nome_Escola'], 
+                top_10_escolas['Total_Alunos'], 
+                color='coral')
+        ax.set_xlabel("Quantidade de Alunos")
+        ax.set_ylabel("Escolas")
+        ax.set_title("Top 10 Escolas com Alunos Autistas ou com Deficiência Intelectual")
+        ax.invert_yaxis()  # Inverter o eixo Y para a escola com mais alunos aparecer no topo
+        st.pyplot(fig)
+
+# Função para exibir as escolas com as respectivas contagens de matrículas
+def display_school_enrollments(df_escolas):
+    st.subheader("Contagem de Matrículas por Escola")
+
+    # Filtro para selecionar a escola
+    school_names = df_escolas['Nome'].tolist()
+    selected_school_name = st.selectbox("Escolha uma escola", school_names)
+
+    # Obtendo o ID da escola selecionada
+    selected_school_id = df_escolas[df_escolas['Nome'] == selected_school_name]['Codigo'].values[0]
+
+    # Consulta SQL para selecionar as matrículas da escola específica
+    escolas_query = f"""
+        SELECT 
+            escolas.NO_ENTIDADE AS Nome,
+            escolas.CO_ENTIDADE AS Codigo,
+            COUNT(matriculas.ID_MATRICULA) AS Contagem
+        FROM escolas
+        LEFT JOIN matriculas ON matriculas.CO_ENTIDADE = escolas.CO_ENTIDADE
+        WHERE escolas.CO_ENTIDADE = {selected_school_id}
+        GROUP BY escolas.CO_ENTIDADE;
+    """
+    
+    # Executar a consulta
+    df_escolas_selecionada = execute_query(escolas_query)
+
+    # Exibir a tabela no Streamlit
+    st.dataframe(df_escolas_selecionada, use_container_width=True)
+
+# Função para o ranqueamento de escolas por matrícula
+def display_rank_enrollments(df_escolas):
+    
+    query = """
+    WITH RankedSchools AS (
+    SELECT 
+        e.NO_ENTIDADE AS Nome_Escola,
+        e.CO_ENTIDADE AS Codigo_Escola,
+        COUNT(m.ID_MATRICULA) AS Contagem,
+        RANK() OVER (ORDER BY COUNT(m.ID_MATRICULA) DESC) AS `Rank`
+    FROM 
+        escolas e
+    LEFT JOIN 
+        matriculas m ON e.CO_ENTIDADE = m.CO_ENTIDADE
+    GROUP BY 
+        e.CO_ENTIDADE
+)
+SELECT 
+    Nome_Escola,
+    Codigo_Escola,
+    Contagem,
+    `Rank`
+FROM RankedSchools
+ORDER BY `Rank`;
+        """
+
+    # Obter os dados da consulta
+    df_escolas = execute_query(query)
+
+    # Exibir os dados em uma tabela
+    st.subheader("Tabela de Ranqueamento de Escolas por Matriculas")
+    st.dataframe(df_escolas, use_container_width=True)
+
+    # Filtrar apenas as 10 primeiras escolas
+    df_top_10 = df_escolas.head(10)
+
+    # Gráfico de barras das 10 escolas com maior contagem de matrículas
+    st.subheader("Gráfico: Top 10 Escolas por Contagem de Matrículas")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.barh(df_top_10['Nome_Escola'], df_top_10['Contagem'], color='skyblue')
+    ax.set_xlabel("Quantidade de Matrículas")
+    ax.set_ylabel("Escolas")
+    ax.set_title("Top 10 Escolas por Contagem de Matrículas")
+    ax.invert_yaxis()  # Inverte o eixo para a maior contagem aparecer no topo
+    st.pyplot(fig)
+
 # Função principal para exibir as abas
 def app():
     # Seleção da aba
-    page = st.sidebar.radio("Análise de Escolas", ["Escolas", "Turmas por Escola", "Alunos e Professores por Escola", "Alunos por Nível de Ensino"])
-    
+    page = st.sidebar.radio("🏫 Análise de Escolas", ["Escolas", "Turmas por Escola", "Alunos e Professores por Escola", "Alunos por Nível de Ensino", "Escolas com Alunos Autistas ou com Deficiência Intelectual", "Contagem de Matrículas por Escola", "Ranqueamento de Escolas (Por Número de Matriculas)"])
+
     # Inicializa apenas na aba "Escolas"
     df_escolas = None
     if page == "Escolas":
@@ -316,13 +388,22 @@ def app():
                 Alunos a ON e.CO_ENTIDADE = a.CO_ENTIDADE
             ORDER BY Total_Alunos DESC
         """)
-    
+
+    # Definir a lógica para exibição das diferentes abas
+    #if page == "Escolas":
+        #df_escolas = display_schools()
     if page == "Turmas por Escola":
         display_school_classes(df_escolas)
     elif page == "Alunos e Professores por Escola":
         display_students_and_teachers(df_escolas)
     elif page == "Alunos por Nível de Ensino":
         display_students_by_level(df_escolas)
+    elif page == "Escolas com Alunos Autistas ou com Deficiência Intelectual":
+        display_autistic_or_intellectual_disability_students(df_escolas)
+    elif page == "Contagem de Matrículas por Escola":
+        display_school_enrollments(df_escolas)
+    elif page == "Ranqueamento de Escolas (Por Número de Matriculas)":
+        display_rank_enrollments(df_escolas)
 
 if __name__ == '__main__':
     app()
