@@ -1,6 +1,6 @@
 
 # Acessar Aplicação Online
-https://projeto-lbd.streamlit.app/
+https://projeto-escolas.streamlit.app/
 
 # Configuração e Execução do Ambiente Virtual Python
 
